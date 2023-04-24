@@ -6,114 +6,119 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class Main {
 	public static String generateText(String letters, int length) {
-    	Random random = new Random();
+		Random random = new Random();
 		StringBuilder text = new StringBuilder();
-    	for (int i = 0; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			text.append(letters.charAt(random.nextInt(letters.length())));
 		}
 		return text.toString();
-  	}
+	}
 
 	public static BlockingQueue<String> queueA = new ArrayBlockingQueue<>(100);
 	public static BlockingQueue<String> queueB = new ArrayBlockingQueue<>(100);
 	public static BlockingQueue<String> queueC = new ArrayBlockingQueue<>(100);
 
-	public static void main(String[] args) {
+	public static int maxA = 0;
+	public static int maxB = 0;
+	public static int maxC = 0;
+
+	public static void main(String[] args) throws InterruptedException {
+
 		Thread getText = new Thread(() -> {
 			String text;
-			for(int i = 0; i < 10_000; i++) {
+			for (int i = 0; i < 10_000; i++) {
 				text = generateText("abc", 100_000);
 
-				try{
+				try {
 					queueA.put(text);
-					System.out.println(text);
+					System.out.print(".");
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					return;
 				}
 
 				try {
 					queueB.put(text);
-					System.out.println(text);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					return;
 				}
 
 				try {
 					queueC.put(text);
-					System.out.println(text);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					return;
 				}
 			}
 		});
 
 		Thread analyzeA = new Thread(() -> {
 			String text;
-			int count = 0;
-			int max = 0;
-			while (true) {
-				try {
+			try {
+				for (int i = 0; i < 10_000; i++) {
+					int count = 0;
 					text = queueA.take();
-					for (int i = 0; i < text.length(); i++) {
-						if (text.charAt(i) == 'a') count++;
+					System.out.print("*");
+					System.out.print(queueA.size());
+					Thread.sleep(100);
+					for (int j = 0; j < text.length(); j++) {
+						if (text.charAt(i) == 'a')
+							count++;
 					}
-					if (count > max) max = count;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					if (count > maxA) maxA = count;
 				}
+			} catch (InterruptedException e) {
+				return;
 			}
-			System.out.println(max);
 		});
 
 		Thread analyzeB = new Thread(() -> {
 			String text;
-			int count = 0;
-			int max = 0;
-			while (true) {
-				try {
+			try {
+				for (int i = 0; i < 10_000; i++) {
+					int count = 0;
 					text = queueA.take();
-					for (int i = 0; i < text.length(); i++) {
-						if (text.charAt(i) == 'b') count++;
+					for (int j = 0; j < text.length(); j++) {
+						if (text.charAt(i) == 'b')
+							count++;
 					}
-					if (count > max) max = count;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					if (count > maxA) maxA = count;
 				}
+			} catch (InterruptedException e) {
+				return;
 			}
-			System.out.println(max);
 		});
-
 		Thread analyzeC = new Thread(() -> {
 			String text;
-			int count = 0;
-			int max = 0;
-			while (true) {
-				try {
+			try {
+				for (int i = 0; i < 10_000; i++) {
+					int count = 0;
 					text = queueA.take();
-					for (int i = 0; i < text.length(); i++) {
-						if (text.charAt(i) == 'c') count++;
+					for (int j = 0; j < text.length(); j++) {
+						if (text.charAt(i) == 'c')
+							count++;
 					}
-					if (count > max) max = count;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					if (count > maxA) maxA = count;
 				}
+			} catch (InterruptedException e) {
+				return;
 			}
-			System.out.println(max);
 		});
 
 		getText.start();
 		analyzeA.start();
 		analyzeB.start();
 		analyzeC.start();
-		/*	
+
 		try {
 			getText.join();
 			analyzeA.join();
 			analyzeB.join();
 			analyzeC.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			return;
 		}
-		*/
+
+		System.out.println(maxA);
+		System.out.println(maxB);
+		System.out.println(maxC);
 	}
 }
