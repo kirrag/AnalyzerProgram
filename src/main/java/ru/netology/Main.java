@@ -14,12 +14,9 @@ public class Main {
 		return text.toString();
 	}
 
-	//public static BlockingQueue<String> queueA = new ArrayBlockingQueue<>(100);
-	public static BlockingQueue<String> queueA = new ArrayBlockingQueue<>(5);
-	//public static BlockingQueue<String> queueB = new ArrayBlockingQueue<>(100);
-	public static BlockingQueue<String> queueB = new ArrayBlockingQueue<>(5);
-	//public static BlockingQueue<String> queueC = new ArrayBlockingQueue<>(100);
-	public static BlockingQueue<String> queueC = new ArrayBlockingQueue<>(5);
+	public static BlockingQueue<String> queueA = new ArrayBlockingQueue<>(100);
+	public static BlockingQueue<String> queueB = new ArrayBlockingQueue<>(100);
+	public static BlockingQueue<String> queueC = new ArrayBlockingQueue<>(100);
 
 	public static int maxA = 0;
 	public static int maxB = 0;
@@ -29,11 +26,8 @@ public class Main {
 
 		Thread getText = new Thread(() -> {
 			String text;
-			//for (int i = 0; i < 10_000; i++) {
-			for (int i = 0; i < 10; i++) {
-				//text = generateText("abc", 100_000);
-				text = generateText("abc", 10);
-				System.out.println(text + " - " + i);
+			for (int i = 0; i < 10_000; i++) {
+				text = generateText("abc", 100_000);
 
 				try {
 					queueA.put(text);
@@ -52,23 +46,18 @@ public class Main {
 				} catch (InterruptedException e) {
 					return;
 				}
+
 			}
-			System.out.println(queueA);
-			System.out.println(queueB);
-			System.out.println(queueC);
 		});
 
 		Thread analyzeA = new Thread(() -> {
 			String text;
 			try {
-				//for (int i = 0; i < 10_000; i++) {
-				for (int i = 0; i < 10; i++) {
+				for (int i = 0; i < 10_000; i++) {
 					int count = 0;
 					text = queueA.take();
-					System.out.println(text + " " + i);
 					for (int j = 0; j < text.length(); j++) {
-						if (text.charAt(j) == 'a')
-							count++;
+						if (text.charAt(j) == 'a') count++;
 					}
 					if (count > maxA) maxA = count;
 				}
@@ -80,33 +69,29 @@ public class Main {
 		Thread analyzeB = new Thread(() -> {
 			String text;
 			try {
-				//for (int i = 0; i < 10_000; i++) {
-				for (int i = 0; i < 10; i++) {
+				for (int i = 0; i < 10_000; i++) {
 					int count = 0;
-					text = queueA.take();
+					text = queueB.take();
 					for (int j = 0; j < text.length(); j++) {
-						if (text.charAt(j) == 'b')
-							count++;
+						if (text.charAt(j) == 'b') count++;
 					}
-					if (count > maxA) maxA = count;
+					if (count > maxB) maxB = count;
 				}
 			} catch (InterruptedException e) {
 				return;
 			}
 		});
-		
+
 		Thread analyzeC = new Thread(() -> {
 			String text;
 			try {
-				//for (int i = 0; i < 10_000; i++) {
-				for (int i = 0; i < 10; i++) {
+				for (int i = 0; i < 10_000; i++) {
 					int count = 0;
-					text = queueA.take();
+					text = queueC.take();
 					for (int j = 0; j < text.length(); j++) {
-						if (text.charAt(j) == 'c')
-							count++;
+						if (text.charAt(j) == 'c') count++;
 					}
-					if (count > maxA) maxA = count;
+					if (count > maxC) maxC = count;
 				}
 			} catch (InterruptedException e) {
 				return;
